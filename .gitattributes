@@ -1,0 +1,7 @@
+vid1.mp4 filter=lfs diff=lfs merge=lfs -text
+vid2.mp4 filter=lfs diff=lfs merge=lfs -text
+vid3.mp4 filter=lfs diff=lfs merge=lfs -text
+vid4.mp4 filter=lfs diff=lfs merge=lfs -text
+vid5.mp4 filter=lfs diff=lfs merge=lfs -text
+vid6.mp4 filter=lfs diff=lfs merge=lfs -text
+blenderModel.gltf filter=lfs diff=lfs merge=lfs -text

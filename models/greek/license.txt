@@ -1,0 +1,11 @@
+Model Information:
+* title:	Greek column
+* source:	https://sketchfab.com/3d-models/greek-column-a22df7d9684345e0b9fffa3b91227f88
+* author:	inskipp (https://sketchfab.com/inskipp)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Greek column" (https://sketchfab.com/3d-models/greek-column-a22df7d9684345e0b9fffa3b91227f88) by inskipp (https://sketchfab.com/inskipp) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
