@@ -4,10 +4,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "deploy": "vite deploy"
   },
   "devDependencies": {
     "dat.gui": "^0.7.9",
+    "gh": "^2.8.9",
+    "pages": "^0.0.16",
     "vite": "^2.3.0"
   },
   "dependencies": {

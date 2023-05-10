@@ -2,14 +2,13 @@ import './style.css';
 
 import * as THREE from 'three';
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
-import { BoxLineGeometry } from 'three/examples/jsm/geometries/BoxLineGeometry.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import * as ThreeMeshUI from "https://cdn.skypack.dev/three-mesh-ui";
 
-import FontJSON from './RobotoMono-Italic-VariableFont_wght-msdf.json';
-import FontImage from './RobotoMono-Italic-VariableFontwght.png';
+import FontJSON from './fonts/instrumentMsdf.json';
+import FontImage from './fonts/instrument.png';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 import { GUI } from 'dat.gui'
@@ -17,10 +16,10 @@ import { GUI } from 'dat.gui'
 let scene, camera, renderer, controls;
 let zDist, buttonCount, wall1, wall2, wall3, wall4, wall5, wall6, rules;
 let vid1, vid2, vid3, vid4, vid5, vid6;
-let vid1End, vid2End, vid3End, vid4End, vid5End, vid6End;
-let isMoving= false;
+let modelStand;
+let isMoving=false;
 let glassCase;
-let fontMesh;
+let fontMesh1,fontMesh2;
 const objsToTest = [];
 let model = new THREE.Object3D( );
 let c, size;
@@ -28,14 +27,9 @@ let yRotation=3.21;
 let star;
 let xPosition=-1.5;
 let zPosition=3.1;
-let modelContainer= new Array();
 
 window.addEventListener( 'load', init );
 window.addEventListener( 'resize', onWindowResize );
-
-// compute mouse position in normalized device coordinates
-// (-1 to +1) for both directions.
-// Used to raycasting against the interactive elements
 
 const raycaster = new THREE.Raycaster();
 
@@ -69,8 +63,6 @@ window.addEventListener( 'touchend', () => {
 	mouse.y = null;
 } );
 
-//
-
 function init() {
 
 	////////////////////////
@@ -79,6 +71,7 @@ function init() {
 
 	scene = new THREE.Scene();
 	scene.background = new THREE.Texture('');
+	scene. fog = new THREE. Fog( 0xffffff, 0.015, 250 );
 
 	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -90,8 +83,6 @@ function init() {
 	document.body.appendChild( VRButton.createButton( renderer ) );
 	document.body.appendChild( renderer.domElement );
 
-	// Orbit controls for no-vr
-
 	//controls = new OrbitControls( camera, renderer.domElement );
 	camera.position.set( 0, 1.3, 200 );
 	//controls.target = new THREE.Vector3( 0, 1, 0 );
@@ -101,15 +92,18 @@ function init() {
 	////////
 
 	const gui = new GUI()
-	const cameraFolder = gui.addFolder('Camera');
-	cameraFolder.add(camera.position, 'z', 23, 200).name('Move');
-	cameraFolder.add(camera.position, 'z', 20,20).name('Video 1');
-	cameraFolder.add(camera.position, 'z',17,17).name('Video 2');
-	cameraFolder.add(camera.position, 'z',14,14).name('Video 3');
-	cameraFolder.add(camera.position, 'z',11,11).name('Video 4');
-	cameraFolder.add(camera.position, 'z',8,8).name('Video 5');
-	cameraFolder.add(camera.position, 'z',5,5).name('Video 6');
-	//cameraFolder.open()
+	const first = gui.addFolder('I');
+	first.add(camera.position, 'z', 19.25, 200).name('insecurity');
+	const second  = gui.addFolder('II');
+	second.add(camera.position,'z',16.25,19.25).name('innocence');
+	const third  = gui.addFolder('III');
+	third.add(camera.position,'z',13.25,16.25).name('self-loathing');
+	const fourth  = gui.addFolder('IV');
+	fourth.add(camera.position,'z',10.25,13.25).name('willpower');
+	const fifth  = gui.addFolder('V');
+	fifth.add(camera.position,'z',7.25,10.25).name('shame');
+	const sixth  = gui.addFolder('VI');
+	sixth.add(camera.position,'z',4.25,7.25).name('everything');
 
 	////////////
 	//STARS
@@ -127,56 +121,70 @@ function init() {
 		  scene.add(star);
 		}
 		
-		Array(1200).fill().forEach(addStar);
+		Array(2000).fill().forEach(addStar);
+
 	//////////
 	//TEXT
 	//////////
+
 	const fontLoader = new THREE.FontLoader()
-	fontLoader.load( './sourceCodePro.json', function (font) {
-		let text = 'impermanent'
-		const fontGeometry = new THREE.TextGeometry(text, {
+	fontLoader.load( './fonts/instrument.json', function (font) {
+		let text1 = 'impermanent'
+		const fontGeometry1 = new THREE.TextGeometry(text1, {
 		   font: font,
 		   size: 3,
 		   height: 0.4,
 		   curveSegments: 12,
 		   bevelEnabled: true,
 		   bevelOffset: 0,
-		   bevelThickness: 0.5,
+		   bevelThickness: 0.1,
+		   bevelSize: 0.3,
+		   bevelSegments: 5
+		})
+		let text2 = 'created by connor hester'
+		const fontGeometry2 = new THREE.TextGeometry(text2, {
+		   font: font,
+		   size: 3,
+		   height: 0.4,
+		   curveSegments: 12,
+		   bevelEnabled: true,
+		   bevelOffset: 0,
+		   bevelThickness: 0.1,
 		   bevelSize: 0.3,
 		   bevelSegments: 5
 		})
 		const fontMaterial = [
 		   new THREE.MeshPhongMaterial({
-			  color: 0xffffff,
+			  color: 0x330404,
 		   flatShading: true
 		   }), // front
-		   new THREE.MeshPhongMaterial({
-		   color: 0x000000
-		   }) // side
+		   //new THREE.MeshPhongMaterial({
+		   //color: 0x000000
+		   //}) // side
 		]
-		fontMesh = new THREE.Mesh(fontGeometry, fontMaterial)
-		fontGeometry.computeBoundingBox()
-		fontGeometry.computeVertexNormals()
-		fontGeometry.boundingBox.getCenter(fontMesh.position).multiplyScalar(-1)
-		fontMesh.position.x = -fontGeometry.boundingBox.max.x / 2
+		fontMesh1 = new THREE.Mesh(fontGeometry1, fontMaterial)
+		fontGeometry1.computeBoundingBox()
+		fontGeometry1.computeVertexNormals()
+		fontGeometry1.boundingBox.getCenter(fontMesh1.position).multiplyScalar(-1)
+		fontMesh1.position.x = -fontGeometry1.boundingBox.max.x / 2
+		fontMesh2 = new THREE.Mesh(fontGeometry2, fontMaterial)
+		fontGeometry2.computeBoundingBox()
+		fontGeometry2.computeVertexNormals()
+		fontGeometry2.boundingBox.getCenter(fontMesh2.position).multiplyScalar(-1)
+		fontMesh2.position.x = -fontGeometry2.boundingBox.max.x / 2
 		const parent = new THREE.Object3D()
-		fontMesh.scale.set(3,3,3);
-		fontMesh.position.set(-40,19,150);
-		parent.add(fontMesh)
+		fontMesh1.scale.set(3,3,3);
+		fontMesh1.position.set(-30,19,150);
+		fontMesh2.scale.set(1.5,1.5,1.5);
+		fontMesh2.position.set(-26,17,125);
+		parent.add(fontMesh1)
+		parent.add(fontMesh2);
 		scene.add(parent)
 		}, undefined, function ( error ) {
 		
 			console.error( error );
 		});
-	
-	// promisify font loading
-	function loadFont(url) {
-	   return new Promise((resolve, reject) => {
-		  fontLoader.load(url, resolve, undefined, reject)
-	   })
-	}
-		const font = loadFont('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json')
-		
+
 	//////////
 	// Light
 	//////////
@@ -185,45 +193,55 @@ function init() {
 
 	scene.add( hemLight );
 
+	const spotLight = new THREE.SpotLight(0xE0E0E0,0.2);
+	spotLight.position.set( 0, 30, 20 );
+	spotLight.map = new THREE.TextureLoader().load( "/images/perlin.png" );
+
+	spotLight.castShadow = true;
+
+	spotLight.shadow.mapSize.width = 1024;
+	spotLight.shadow.mapSize.height = 1024;
+
+	spotLight.shadow.camera.near = 500;
+	spotLight.shadow.camera.far = 4000;
+	spotLight.shadow.camera.fov = 30;
+
+	scene.add( spotLight );
+	const targetObject=new THREE.Object3D();
+	targetObject.position.set(-1,-3,-20);
+	scene.add(targetObject);
+	spotLight.target=targetObject;
+
 	/////////////
-	//TEST STUFF
+	//OBJECTS
 	/////////////
+
 	var image = document.createElement( 'img' );
-	image.src = './brain.png';
+	image.src = '/images/brain.png';
 	
 	var texture = new THREE.Texture( image );
 	texture.needsUpdate = true;
 
-
-	const geometry = new RoundedBoxGeometry(4.5,3.5,0.1,5,3);
+	const geometry = new RoundedBoxGeometry(5,4,1,5,3);
 	const material = new THREE.MeshStandardMaterial({ map:texture });
 	wall1 = new THREE.Mesh(geometry, material);
-	wall1.position.set(0,1.25,17);
+	wall1.position.set(0,1.25,16.65);
 	scene.add(wall1);
 	wall2 = new THREE.Mesh(geometry, material);
-	wall2.position.set(0,1.25,14);
+	wall2.position.set(0,1.25,13.65);
 	scene.add(wall2);
 	wall3 = new THREE.Mesh(geometry, material);
-	wall3.position.set(0,1.25,11);
+	wall3.position.set(0,1.25,10.65);
 	scene.add(wall3);
 	wall4 = new THREE.Mesh(geometry, material);
-	wall4.position.set(0,1.25,8);
+	wall4.position.set(0,1.25,7.65);
 	scene.add(wall4);
 	wall5 = new THREE.Mesh(geometry, material);
-	wall5.position.set(0,1.25,5);
+	wall5.position.set(0,1.25,4.65);
 	scene.add(wall5);
 	wall6 = new THREE.Mesh(geometry, material);
-	wall6.position.set(0,1.25,2);
+	wall6.position.set(0,1.25,1.65);
 	scene.add(wall6);
-
-	const rulesGeo = new THREE.BoxGeometry(45,80,10,10,10,10);
-	const rulesMat = new THREE.MeshStandardMaterial({color:0xFFFFFF});
-	rules = new THREE.Mesh(rulesGeo,rulesMat);
-	//scene.add(rules);
-	rules.position.copy( camera.position );
-	rules.updateMatrix();
-	rules.translateZ( - 20 );
-	rules.translateX(30);
 
 	const glassCaseGeo=new RoundedBoxGeometry(55,55,55,7,6);
 	const glassCaseMat=new THREE.MeshPhysicalMaterial({metalness: .9,
@@ -240,50 +258,48 @@ function init() {
 	glassCase=new THREE.Mesh(glassCaseGeo,glassCaseMat);
 	glassCase.position.set(-1,-3,20);
 	scene.add(glassCase);
-	// camera.add(rules);
-	// rules.position.set(0,0,-10);
+
+	const modelStandGeo=new RoundedBoxGeometry(65,200,65,7,6);
+	const modelStandMat= new THREE.MeshPhongMaterial({reflectivity:1, color:0x000000});
+	modelStand=new THREE.Mesh(modelStandGeo,modelStandMat);
+	modelStand.position.set(-1,-130,20);
+	scene.add(modelStand);
 
 	////////
 	//Video
 	////////
 
 	const video1 = document.getElementById( 'video1' );
-	//vid1End=document.getElementById('video1').addEventListener('ended',proceedButton(18.05,1),false);
 	const vid1Texture = new THREE.VideoTexture( video1 );
 	vid1 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid1Texture }));
 	vid1.position.set(0,1.24,17.1);
 	scene.add(vid1);
 	
 	const video2 = document.getElementById( 'video2' );
-	//vid2End=document.getElementById('video2').addEventListener('ended',proceedButton(15.05,2),false);
 	const vid2Texture = new THREE.VideoTexture( video2 );
 	vid2 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid2Texture }));
 	vid2.position.set(0,1.24,14.1);
 	scene.add(vid2);
 
 	const video3 = document.getElementById( 'video3' );
-	//vid3End=document.getElementById('video3').addEventListener('ended',proceedButton(12.05,3),false);
 	const vid3Texture = new THREE.VideoTexture( video3 );
 	vid3 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid3Texture }));
 	vid3.position.set(0,1.24,11.1);
 	scene.add(vid3);
 
 	const video4 = document.getElementById( 'video4' );
-	//vid4End=document.getElementById('video4').addEventListener('ended',proceedButton(9.05,4),false);
 	const vid4Texture = new THREE.VideoTexture( video4 );
 	vid4 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid4Texture }));
 	vid4.position.set(0,1.24,8.1);
 	scene.add(vid4);
 
 	const video5 = document.getElementById( 'video5' );
-	//vid5End=document.getElementById('video5').addEventListener('ended',proceedButton(6.05,5),false);
 	const vid5Texture = new THREE.VideoTexture( video5 );
 	vid5 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid5Texture }));
 	vid5.position.set(0,1.24,5.1);
 	scene.add(vid5);
 
 	const video6 = document.getElementById( 'video6' );
-	//vid6End=document.getElementById('video6').addEventListener('ended',proceedButton(3.05,6),false);
 	const vid6Texture = new THREE.VideoTexture( video6 );
 	vid6 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid6Texture }));
 	vid6.position.set(0,1.24,2.1);
@@ -296,31 +312,6 @@ function init() {
 	const loader = new GLTFLoader();
 	loader.load( 'models/blenderModel.gltf', process);
 
-	loader.load( 'models/greek/scene.gltf', function ( gltf ) {
-
-		scene.add( gltf.scene );
-		  gltf.scene.position.set(0,-110,15);
-		  gltf.scene.rotation.set(0,0.38,0);
-		  gltf.asset;
-		  gltf.scene.scale.set(165,80,165);
-		  
-		}, undefined, function ( error ) {
-		
-			console.error( error );
-		});
-		loader.load( 'models/case4.gltf', function ( gltf ) {
-
-			scene.add( gltf.scene );
-			  gltf.scene.position.set(0,-15,15);
-			  gltf.asset;
-			  gltf.scene.scale.set(30,30,30);
-			  
-			}, undefined, function ( error ) {
-			
-				console.error( error );
-			});
-	
-
 	//////////
 	// Panel
 	//////////
@@ -331,20 +322,9 @@ function init() {
 	makePanel(9,2,4);
 	makePanel(6,2,5);
 	makePanel(3,2,6);
-	//makePanel(198.5,1);
-	//makePanel(68,1);
 
-	//
 
 	animate();
-
-}
-
-///////////////
-//PROCEED POPUP
-///////////////
-function proceedButton(x,video){
-	makePanel(x,3,video);
 }
 
 //////////////////
@@ -363,10 +343,6 @@ function deleteFunction(obj) {
 ///////////////////
 
 function makePanel(zDist,buttonCount,video) {
-
-	// Container block, in which we put the two buttons.
-	// We don't define width and height, it will be set automatically from the children's dimensions
-	// Note that we set contentDirection: "row-reverse", in order to orient the buttons horizontally
 
 	const container = new ThreeMeshUI.Block( {
 		justifyContent: 'center',
@@ -388,9 +364,6 @@ function makePanel(zDist,buttonCount,video) {
 
 	// BUTTONS
 
-	// We start by creating objects containing options that we will use with the two buttons,
-	// in order to write less code.
-
 	const buttonOptions = {
 		width: 0.4,
 		height: 0.15,
@@ -399,9 +372,6 @@ function makePanel(zDist,buttonCount,video) {
 		margin: 0.02,
 		borderRadius: 0.075
 	};
-
-	// Options for component.setupState().
-	// It must contain a 'state' parameter, which you will refer to with component.setState( 'name-of-the-state' ).
 
 	const hoveredStateAttributes = {
 		state: 'hovered',
@@ -423,12 +393,9 @@ function makePanel(zDist,buttonCount,video) {
 		},
 	};
 
-	// Buttons creation, with the options objects passed in parameters.
 if(buttonCount==2){
 	const buttonNext = new ThreeMeshUI.Block( buttonOptions );
 	const buttonPrevious = new ThreeMeshUI.Block( buttonOptions );
-
-	// Add text to buttons
 
 	buttonNext.add(
 		new ThreeMeshUI.Text( { content: 'play' } )
@@ -437,9 +404,6 @@ if(buttonCount==2){
 	buttonPrevious.add(
 		new ThreeMeshUI.Text( { content: 'pause' } )
 	);
-
-	// Create states for the buttons.
-	// In the loop, we will call component.setState( 'state-name' ) when mouse hover or click
 
 	const selectedAttributes = {
 		offset: 0.02,
@@ -474,8 +438,6 @@ if(buttonCount==2){
 	buttonNext.setupState( hoveredStateAttributes );
 	buttonNext.setupState( idleStateAttributes );
 
-	//
-
 	buttonPrevious.setupState( {
 		state: 'selected',
 		attributes: selectedAttributes,
@@ -504,22 +466,15 @@ if(buttonCount==2){
 	buttonPrevious.setupState( hoveredStateAttributes );
 	buttonPrevious.setupState( idleStateAttributes );
 
-	//
-
 	container.add( buttonNext, buttonPrevious );
 	objsToTest.push( buttonNext, buttonPrevious );
 }
 else if (buttonCount==1){
 	const buttonEnter = new ThreeMeshUI.Block( buttonOptions );
 
-	// Add text to buttons
-
 	buttonEnter.add(
 		new ThreeMeshUI.Text( { content: 'enter' } )
 	);
-
-	// Create states for the buttons.
-	// In the loop, we will call component.setState( 'state-name' ) when mouse hover or click
 
 	const selectedAttributes = {
 		offset: 0.02,
@@ -532,7 +487,6 @@ else if (buttonCount==1){
 		attributes: selectedAttributes,
 		onSet: () => {
 
-			//deleteFunction(wall);
 			camera.position.z=20;
 
 		}
@@ -540,22 +494,15 @@ else if (buttonCount==1){
 	buttonEnter.setupState( hoveredStateAttributes );
 	buttonEnter.setupState( idleStateAttributes );
 
-	//
-
 	container.add( buttonEnter );
 	objsToTest.push(buttonEnter );
 }
 else if (buttonCount==3){
 	const buttonEnter = new ThreeMeshUI.Block( buttonOptions );
 
-	// Add text to buttons
-
 	buttonEnter.add(
 		new ThreeMeshUI.Text( { content: 'proceed' } )
 	);
-
-	// Create states for the buttons.
-	// In the loop, we will call component.setState( 'state-name' ) when mouse hover or click
 
 	const selectedAttributes = {
 		offset: 0.02,
@@ -567,7 +514,7 @@ else if (buttonCount==3){
 		state: 'selected',
 		attributes: selectedAttributes,
 		onSet: () => {
-			//camera.position.z-=1.5;
+
 			if(video==1){
 				deleteFunction(vid1);
 				camera.position.z=17;
@@ -591,7 +538,6 @@ else if (buttonCount==3){
 			else if (video==6){
 				deleteFunction(vid6);
 				camera.position.z=80;
-			//vid1.position.y=-100;
 			}
 			
 		}
@@ -599,14 +545,10 @@ else if (buttonCount==3){
 	buttonEnter.setupState( hoveredStateAttributes );
 	buttonEnter.setupState( idleStateAttributes );
 
-	//
-
 	container.add( buttonEnter );
 	objsToTest.push(buttonEnter );
 }
 }
-
-// Handle resizing the viewport
 
 function onWindowResize() {
 
@@ -618,9 +560,6 @@ function onWindowResize() {
 
 function animate() {
 	requestAnimationFrame(animate);
-	// Don't forget, ThreeMeshUI must be updated manually.
-	// This has been introduced in version 3.0.0 in order
-	// to improve performance
 
 	//controls.update();
 	if(camera.position.z<150 && camera.position.z>100){
@@ -638,16 +577,11 @@ function animate() {
 		yRotation=3.2;
 		move(model);
 	}
-	//fontMesh.rotation.x+=0.005;
-	//fontMesh.rotation.z+=0.005;
-	//star.rotation.y+=0.01;
-	//modelContainer[0].scene.rotation.y+=0.1;
+	
 	updateButtons();
 	ThreeMeshUI.update();
 	renderer.render( scene, camera );
 
-	//rules.position.copy( camera.position );
-	//rules.updateMatrix();
 }
 
 function process( gltf ) {	
@@ -670,7 +604,6 @@ function process( gltf ) {
 function move( gltf) {
 	gltf.scene.rotation.set( 0, yRotation, 0 );
 	
-	// rotate center
 	const cz = c.z * Math.cos( yRotation ) - c.x * Math.sin( yRotation );
 	const cx = c.z * Math.sin( yRotation ) + c.x * Math.cos( yRotation );
 	
@@ -678,13 +611,7 @@ function move( gltf) {
 
 }
 
-
-// Called in the loop, get intersection with either the mouse or the VR controllers,
-// then update the buttons states according to result
-
 function updateButtons() {
-
-	// Find closest intersecting object
 
 	let intersect;
 
@@ -696,31 +623,24 @@ function updateButtons() {
 
 	}
 
-	// Update targeted button state (if any)
-
 	if ( intersect && intersect.object.isUI ) {
 
 		if ( selectState ) {
 
-			// Component.setState internally call component.set with the options you defined in component.setupState
 			intersect.object.setState( 'selected' );
 
 		} else {
 
-			// Component.setState internally call component.set with the options you defined in component.setupState
 			intersect.object.setState( 'hovered' );
 
 		}
 
 	}
 
-	// Update non-targeted buttons state
-
 	objsToTest.forEach( ( obj ) => {
 
 		if ( ( !intersect || obj !== intersect.object ) && obj.isUI ) {
 
-			// Component.setState internally call component.set with the options you defined in component.setupState
 			obj.setState( 'idle' );
 
 		}
@@ -728,8 +648,6 @@ function updateButtons() {
 	} );
 
 }
-
-//
 
 function raycast() {
 
@@ -752,427 +670,3 @@ function raycast() {
 	}, null );
 
 }
-
-//////////////////
-//ANIMATION LOOP
-//////////////////
-// function animate() {
-
-// 					requestAnimationFrame( animate );
-	
-// 					controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
-	
-// 					ThreeMeshUI.update();
-	
-// 					render();
-	
-// 				}
-	
-// 				function render() {
-	
-// 					renderer.render( scene, camera );
-	
-// 				}
-
-
-// import * as THREE from 'three';
-// //import { OrbitControls } from '@/node_modules/three/examples/jsm/controls/OrbitControls';
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// import * as ThreeMeshUI from "https://cdn.skypack.dev/three-mesh-ui";
-// import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
-// import { BoxLineGeometry } from 'three/examples/jsm/geometries/BoxLineGeometry.js';
-// import VRControl from './utils/VRControl.js';
-// import ShadowedLight from './utils/ShadowedLight.js';
-
-// import FontJSON from './assets/Roboto-msdf.json';
-// import FontImage from './assets/Roboto-msdf.png';
-
-
-
-// // Setup
-
-
-// //import * as THREE from 'three';
-
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
-// 			let camera, controls, scene, renderer;
-
-// 			init();
-// 			//render(); // remove when using next line for animation loop (requestAnimationFrame)
-// 			animate();
-
-// 			function init() {
-// 				scene = new THREE.Scene();
-// 				scene.background = new THREE.Color( 0xcccccc );
-// 				//scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
-
-// 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-// 				renderer.setPixelRatio( window.devicePixelRatio );
-// 				renderer.setSize( window.innerWidth, window.innerHeight );
-// 				document.body.appendChild( renderer.domElement );
-
-// 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-// 				camera.position.set( 0, 10, -200 );
-
-// 				// controls
-
-// 				controls = new OrbitControls( camera, renderer.domElement );
-// 				controls.listenToKeyEvents( window ); // optional
-
-// 				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
-
-// 				controls.enableDamping = false; // an animation loop is required when either damping or auto-rotation are enabled
-
-// 				controls.screenSpacePanning = false;
-
-// 				// controls.minDistance = 10;
-// 				// controls.maxDistance = 2000;
-
-// 				controls.maxPolarAngle = Math.PI / 2;
-
-// 				controls.mouseButtons = {
-// 					LEFT: THREE.MOUSE.ROTATE,
-// 					MIDDLE: THREE.MOUSE.DOLLY*50,
-// 					RIGHT: THREE.MOUSE.PAN
-// 				}
-
-// 				// world
-
-// 				const geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-// 				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
-
-// 				for ( let i = 0; i < 500; i ++ ) {
-
-// 					const mesh = new THREE.Mesh( geometry, material );
-// 					mesh.position.x = Math.random() * 1600 - 800;
-// 					mesh.position.y = 0;
-// 					mesh.position.z = Math.random() * 1600 - 800;
-// 					mesh.updateMatrix();
-// 					mesh.matrixAutoUpdate = false;
-// 					scene.add( mesh );
-
-// 				}
-
-// 				// lights
-
-// 				const dirLight1 = new THREE.DirectionalLight( 0xffffff );
-// 				dirLight1.position.set( 1, 1, 1 );
-// 				scene.add( dirLight1 );
-
-// 				const dirLight2 = new THREE.DirectionalLight( 0x002288 );
-// 				dirLight2.position.set( - 1, - 1, - 1 );
-// 				scene.add( dirLight2 );
-
-// 				const ambientLight = new THREE.AmbientLight( 0x222222 );
-// 				scene.add( ambientLight );
-
-// 				//
-
-// 				window.addEventListener( 'resize', onWindowResize );
-
-
-// 			}
-
-// 			function onWindowResize() {
-
-// 				camera.aspect = window.innerWidth / window.innerHeight;
-// 				camera.updateProjectionMatrix();
-
-// 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-// 			}
-
-// 			function animate() {
-
-// 				requestAnimationFrame( animate );
-
-// 				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
-
-// 				ThreeMeshUI.update();
-
-// 				render();
-
-// 			}
-
-// 			function render() {
-
-// 				renderer.render( scene, camera );
-
-// 			}
-
-
-
-
-
-
-
-
-
-
-
-
-// const modelStorage=Array();
-// let canScroll=true;
-// let controls 
-
-// const scene = new THREE.Scene();
-
-// const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-
-// const renderer = new THREE.WebGLRenderer
-// document.body.appendChild( renderer.domElement );
-
-// renderer.setPixelRatio(window.devicePixelRatio);
-// renderer.setSize(window.innerWidth, window.innerHeight);
-
-// controls = new OrbitControls(camera, renderer.domElement);
-// controls.autorotate=true;
-// // scene.add(controls);
-
-// //camera.position.setZ(30);
-// camera.position.setX(-3);
-// controls.update();
-
-// renderer.render(scene, camera);
-
-// const startButton = document.getElementById( 'startButton' );
-// 			startButton.addEventListener( 'click', function () {
-//       //disableScroll();
-// 		playVideo1();
-//     console.log(camera.position.x);
-//     console.log(camera.position.y);
-//     console.log(camera.position.z);
-
-// 			}, false );
-
-// const startButton2=document.getElementById('startButton2');
-//       startButton2.addEventListener('click', function(){
-//         playVideo2();},false);
-
-
-//         const startButton3=document.getElementById('startButton3');
-//         startButton3.addEventListener('click', function(){
-//           playVideo3();},false);
-          
-// // document.getElementById('video1').addEventListener('ended',enableScroll,false);
-// //   function enableScroll(){
-// //     window.onScroll=function(){};
-// //   }
-
-// // Lights
-
-// const pointLight = new THREE.PointLight(0xffffff);
-// pointLight.position.set(5, 5, 5);
-
-// const pointLight2= new THREE.PointLight(0xffffff);
-// pointLight2.position.set(0,2,15);
-
-// const ambientLight = new THREE.AmbientLight(0xffffff);
-// scene.add(pointLight, ambientLight, pointLight2);
-
-// // Helpers
-
-// //const lightHelper = new THREE.PointLightHelper(pointLight)
-// //const gridHelper = new THREE.GridHelper(200, 50);
-// //scene.add(lightHelper, gridHelper)
-
-
-// //Models
-// const loader = new GLTFLoader();
-
-// loader.load( 'models/CRTTVMODEL.gltf', function ( gltf ) {
-
-// 	scene.add( gltf.scene );
-//   gltf.scene.rotation.y=4.625;
-//   gltf.scene.position.x=-2.6;
-//   gltf.scene.position.y=-2.6;
-//   gltf.scene.position.z=12.85;
-//   gltf.asset;
-//   //gltf.scene.scale(10,10);
-//   modelStorage.push(gltf.scene);
-  
-// }, undefined, function ( error ) {
-
-// 	console.error( error );
-
-// });
-
-// loader.load( 'models/CRTTVMODEL.gltf', function ( gltf ) {
-
-// 	scene.add( gltf.scene );
-//   gltf.scene.rotation.y=4.6;
-//   gltf.scene.position.x=-3.4;
-//   gltf.scene.position.y=-2.6;
-//   gltf.scene.position.z=21;
-//   gltf.asset;
-//   //gltf.scene.scale(10,10);
-//   modelStorage.push(gltf.scene);
-  
-// }, undefined, function ( error ) {
-
-// 	console.error( error );
-
-// } );
-
-// loader.load( 'models/CRTTVMODEL.gltf', function ( gltf ) {
-
-// 	scene.add( gltf.scene );
-//   gltf.scene.rotation.y=4.6;
-//   gltf.scene.position.x=-3.4;
-//   gltf.scene.position.y=-2.6;
-//   gltf.scene.position.z=29;
-//   gltf.asset;
-//   //gltf.scene.scale(10,10);
-//   modelStorage.push(gltf.scene);
-  
-// }, undefined, function ( error ) {
-
-// 	console.error( error );
-
-// } );
-
-
-  
-
-// loader.load( 'models/faceModels.gltf', function ( gltf ) {
-
-// 	scene.add( gltf.scene );
-//   gltf.scene.rotation.y=4.6;
-//   //gltf.scene.rotation.x=0.5;
-//   gltf.scene.rotation.z=-0.6;
-//   gltf.scene.position.x=-3.6;
-//   gltf.scene.position.y=-2.7;
-//   gltf.scene.position.z=14;
-//   gltf.asset;
-//   //gltf.scene.scale(10,10);
-//   modelStorage.push(gltf.scene);
-
-// }, undefined, function ( error ) {
-
-// 	console.error( error );
-
-// } );
-
-// //Video
-// const video1 = document.getElementById( 'video1' );
-// const vidTexture = new THREE.VideoTexture( video1 );
-// const vid1 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vidTexture }));
-// vid1.position.x=-2.75;
-// vid1.position.y=-0.1;
-// vid1.position.z=14.72;
-// vid1.rotation.y=6.2;
-// //vid1.rotation.y=modelStorage[1].asset.rotation.y;
-// scene.add(vid1);
-
-// const video2=document.getElementById('video2');
-// const vid2Texture=new THREE.VideoTexture(video2);
-// const vid2= new THREE.Mesh(new THREE.BoxGeometry(4,2.5,0.1),new THREE.MeshBasicMaterial({map: vid2Texture}));
-// vid2.position.x=-3.5;
-// vid2.position.y=0.15;
-// vid2.position.z=22.95;
-// vid2.rotation.y=6.18;
-// vid2.rotation.z=-0.001;
-// scene.add(vid2);
-
-
-// const video3=document.getElementById('video3');
-// const vid3Texture=new THREE.VideoTexture(video3);
-// const vid3= new THREE.Mesh(new THREE.BoxGeometry(4,2.5,0.1),new THREE.MeshBasicMaterial({map: vid3Texture}));
-// vid3.position.x=-3.5;
-// vid3.position.y=0.15;
-// vid3.position.z=31;
-// vid3.rotation.y=6.18;
-// vid3.rotation.z=-0.001;
-// scene.add(vid3);
-
-// function addStar() {
-//   const geometry = new THREE.SphereGeometry(0.15, 24, 24);
-//   const material = new THREE.MeshStandardMaterial({ color: 0x000000 });
-//   const star = new THREE.Mesh(geometry, material);
-
-//   const [x, y, z] = Array(3)
-//     .fill()
-//     .map(() => THREE.MathUtils.randFloatSpread(100));
-
-//   star.position.set(x, y, z);
-//   scene.add(star);
-// }
-
-// Array(200).fill().forEach(addStar);
-
-// // Background
-
-// const spaceTexture = new THREE.TextureLoader().load('sceneBackground.jpeg');
-// scene.background = spaceTexture;
-
-
-// function playVideo1(){
-//   video1.play();
-//   //canScroll=false;
-//   //console.log("canScroll=false")
-//   const overlay = document.getElementById( 'overlay' );
-// 				overlay.remove();
-// }
-
-// function playVideo2(){
-//   video2.play();
-//   //canScroll=false;
-//   //console.log("canScroll=false")
-//   const overlay2 = document.getElementById( 'overlay2' );
-// 				overlay2.remove();
-// }
-
-// function playVideo3(){
-//   video3.play();
-//   //canScroll=false;
-//   //console.log("canScroll=false")
-//   const overlay3 = document.getElementById( 'overlay3' );
-// 				overlay3.remove();
-// }
-
-// // function disableScroll(){
-// //   let scrollTop=window.pageYOffset||document.documentElement.scrollTop;
-// //   let scrollLeft=window.pageXOffset||document.documentElement.scrollLeft;
-// //     window.onScroll=function(){
-// //      window.scrollTo(scrollLeft,scrollTop);
-// //      console.log("success");
-// //   }
-// // }
-
-
-
-// // Scroll Animation
-
-// function moveCamera() {
-//   const t = document.body.getBoundingClientRect().top;
-
-//     camera.position.z = t * -0.01;
-  
-//   // if(camera.position.z>10 && camera.position.z<17){
-//   //   camera.position.y+=0.025;
-//   // }
-//   //camera.position.x = t * -0.0002;
-//   //camera.rotation.y = t * -0.0002;
-// }
-
-// document.body.onscroll = moveCamera;
-// moveCamera();
-
-// // Animation Loop
-
-// function animate() {
-//   requestAnimationFrame(animate);
-//   // torus.rotation.x += 0.01;
-//   // torus.rotation.y += 0.005;
-//   // torus.rotation.z += 0.01;
-//   //video1.update()
-
-//   //moon.rotation.x += 0.005;
-  
-//    controls.update();
-   
-//   renderer.render(scene, camera);
-// }
-
-// animate();
