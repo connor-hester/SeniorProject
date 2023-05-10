@@ -1,7 +1,7 @@
 import './style.css';
 
 import * as THREE from 'three';
-import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
+//import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
@@ -80,7 +80,7 @@ function init() {
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.outputEncoding = THREE.sRGBEncoding;
 	renderer.xr.enabled = true;
-	document.body.appendChild( VRButton.createButton( renderer ) );
+	//document.body.appendChild( VRButton.createButton( renderer ) );
 	document.body.appendChild( renderer.domElement );
 
 	//controls = new OrbitControls( camera, renderer.domElement );
@@ -189,11 +189,11 @@ function init() {
 	// Light
 	//////////
 
-	const hemLight = new THREE.HemisphereLight( 0xFFFFFF, 0xFFFFFF );
+	const hemLight = new THREE.HemisphereLight( 0xFFFFFF, 0xFFFFFF,0.3 );
 
 	scene.add( hemLight );
 
-	const spotLight = new THREE.SpotLight(0xE0E0E0,0.2);
+	const spotLight = new THREE.SpotLight(0xE0E0E0,1,0,Math.PI/2,0,0);
 	spotLight.position.set( 0, 30, 20 );
 	spotLight.map = new THREE.TextureLoader().load( "/images/perlin.png" );
 
@@ -206,10 +206,10 @@ function init() {
 	spotLight.shadow.camera.far = 4000;
 	spotLight.shadow.camera.fov = 30;
 
-	scene.add( spotLight );
+	//scene.add( spotLight );
 	const targetObject=new THREE.Object3D();
 	targetObject.position.set(-1,-3,-20);
-	scene.add(targetObject);
+	//scene.add(targetObject);
 	spotLight.target=targetObject;
 
 	/////////////
@@ -222,7 +222,7 @@ function init() {
 	var texture = new THREE.Texture( image );
 	texture.needsUpdate = true;
 
-	const geometry = new RoundedBoxGeometry(5,4,1,5,3);
+	const geometry = new RoundedBoxGeometry(6.5,4,1,5,3);
 	const material = new THREE.MeshStandardMaterial({ map:texture });
 	wall1 = new THREE.Mesh(geometry, material);
 	wall1.position.set(0,1.25,16.65);
@@ -271,38 +271,38 @@ function init() {
 
 	const video1 = document.getElementById( 'video1' );
 	const vid1Texture = new THREE.VideoTexture( video1 );
-	vid1 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid1Texture }));
-	vid1.position.set(0,1.24,17.1);
+	vid1 = new THREE.Mesh(new THREE.BoxGeometry(5.33,3,0.1), new THREE.MeshBasicMaterial({ map: vid1Texture }));
+	vid1.position.set(0,1.27,17.1);
 	scene.add(vid1);
 	
 	const video2 = document.getElementById( 'video2' );
 	const vid2Texture = new THREE.VideoTexture( video2 );
-	vid2 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid2Texture }));
-	vid2.position.set(0,1.24,14.1);
+	vid2 = new THREE.Mesh(new THREE.BoxGeometry(5.33,3,0.1), new THREE.MeshBasicMaterial({ map: vid2Texture }));
+	vid2.position.set(0,1.27,14.1);
 	scene.add(vid2);
 
 	const video3 = document.getElementById( 'video3' );
 	const vid3Texture = new THREE.VideoTexture( video3 );
-	vid3 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid3Texture }));
-	vid3.position.set(0,1.24,11.1);
+	vid3 = new THREE.Mesh(new THREE.BoxGeometry(5.33,3,0.1), new THREE.MeshBasicMaterial({ map: vid3Texture }));
+	vid3.position.set(0,1.27,11.1);
 	scene.add(vid3);
 
 	const video4 = document.getElementById( 'video4' );
 	const vid4Texture = new THREE.VideoTexture( video4 );
-	vid4 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid4Texture }));
-	vid4.position.set(0,1.24,8.1);
+	vid4 = new THREE.Mesh(new THREE.BoxGeometry(5.33,3,0.1), new THREE.MeshBasicMaterial({ map: vid4Texture }));
+	vid4.position.set(0,1.27,8.1);
 	scene.add(vid4);
 
 	const video5 = document.getElementById( 'video5' );
 	const vid5Texture = new THREE.VideoTexture( video5 );
-	vid5 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid5Texture }));
-	vid5.position.set(0,1.24,5.1);
+	vid5 = new THREE.Mesh(new THREE.BoxGeometry(5.33,3,0.1), new THREE.MeshBasicMaterial({ map: vid5Texture }));
+	vid5.position.set(0,1.27,5.1);
 	scene.add(vid5);
 
 	const video6 = document.getElementById( 'video6' );
 	const vid6Texture = new THREE.VideoTexture( video6 );
-	vid6 = new THREE.Mesh(new THREE.BoxGeometry(4,3,0.1), new THREE.MeshBasicMaterial({ map: vid6Texture }));
-	vid6.position.set(0,1.24,2.1);
+	vid6 = new THREE.Mesh(new THREE.BoxGeometry(5.33,3,0.1), new THREE.MeshBasicMaterial({ map: vid6Texture }));
+	vid6.position.set(0,1.27,2.1);
 	scene.add(vid6);
 
 	///////////////
@@ -354,10 +354,10 @@ function makePanel(zDist,buttonCount,video) {
 		borderRadius: 0.11
 	} );
 	if(buttonCount==3){
-		container.position.set(0,0.5,zDist);
+		container.position.set(0,0.3,zDist);
 	}
 	else{
-		container.position.set( 0, 0.7, zDist);
+		container.position.set( 0, 0.5, zDist);
 	}
 	container.rotation.x = -0.55;
 	scene.add( container );
