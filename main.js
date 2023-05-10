@@ -256,7 +256,7 @@ function init() {
         reflectivity: 0.4,
 		});
 	glassCase=new THREE.Mesh(glassCaseGeo,glassCaseMat);
-	glassCase.position.set(-1,-3,20);n
+	glassCase.position.set(-1,-3,20);
 	scene.add(glassCase);
 
 	const modelStandGeo=new RoundedBoxGeometry(65,200,65,7,6);
