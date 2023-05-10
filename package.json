@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "deploy": "vite deploy"
+    "deploy": "gh pages -d build"
   },
   "devDependencies": {
     "dat.gui": "^0.7.9",
